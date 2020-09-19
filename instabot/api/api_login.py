@@ -393,6 +393,73 @@ def load_uuid_and_cookie(self, load_uuid=True, load_cookie=True):
     return True
 
 
+def load_uuid_and_cookie_from_dict(self, cookie_dict={}, load_uuid=True, load_cookie=True):
+        if cookie_dict is None:
+            self.logger.error("No cookie dictionary passed in.")
+            return False
+
+        self.logger.info("Got to dict loading cookie")
+        data = cookie_dict
+        if "cookie" in data:
+            self.last_login = data["timing_value"]["last_login"]
+            self.last_experiments = data["timing_value"][
+                "last_experiments"]
+
+            if load_cookie:
+                self.logger.debug("Loading cookies")
+                self.session.cookies = requests.utils.cookiejar_from_dict(
+                    data["cookie"]
+                )
+                cookie_username = self.cookie_dict["ds_user"]
+                assert cookie_username == self.username.lower()
+                self.cookie_dict["urlgen"]
+
+            if load_uuid:
+                self.logger.debug("Loading uuids")
+                self.phone_id = data["uuids"]["phone_id"]
+                self.uuid = data["uuids"]["uuid"]
+                self.client_session_id = data["uuids"]["client_session_id"]
+                self.advertising_id = data["uuids"]["advertising_id"]
+                self.device_id = data["uuids"]["device_id"]
+
+                self.device_settings = data["device_settings"]
+                self.user_agent = data["user_agent"]
+
+            msg = (
+                "Recovery from {}: COOKIE {} - UUIDs {} - TIMING, DEVICE "
+                "and ...\n- user-agent={}\n- phone_id={}\n- uuid={}\n- "
+                "client_session_id={}\n- device_id={}"
+            )
+
+            self.logger.info(
+                msg.format(
+                    self.cookie_fname,
+                    load_cookie,
+                    load_uuid,
+                    self.user_agent,
+                    self.phone_id,
+                    self.uuid,
+                    self.client_session_id,
+                    self.device_id,
+                )
+            )
+        else:
+            self.logger.info(
+                "The cookie seems to be the with the older structure. "
+                "Load and init again all uuids"
+            )
+            self.session.cookies = requests.utils.cookiejar_from_dict(data)
+            self.last_login = time.time()
+            self.last_experiments = time.time()
+            cookie_username = self.cookie_dict["ds_user"]
+            assert cookie_username == self.username
+            self.set_device()
+            self.generate_all_uuids()
+
+        self.is_logged_in = True
+        return True
+
+
 def save_uuid_and_cookie(self):
     if self.cookie_fname is None:
         fname = "{}_uuid_and_cookie.json".format(self.username)
@@ -416,3 +483,27 @@ def save_uuid_and_cookie(self):
     }
     with open(self.cookie_fname, "w") as f:
         json.dump(data, f)
+
+
+def get_uuid_and_cookie(self):
+    """
+    This method will be used in cases where the cookie and uuid is needed so
+    it could be saved somewhere else than a file.
+    """
+    data = {
+        "uuids": {
+            "phone_id": self.phone_id,
+            "uuid": self.uuid,
+            "client_session_id": self.client_session_id,
+            "advertising_id": self.advertising_id,
+            "device_id": self.device_id,
+        },
+        "cookie": requests.utils.dict_from_cookiejar(self.session.cookies),
+        "timing_value": {
+            "last_login": self.last_login,
+            "last_experiments": self.last_experiments,
+        },
+        "device_settings": self.device_settings,
+        "user_agent": self.user_agent,
+    }
+    return data

@@ -26,10 +26,12 @@ from .api_login import (
     change_device_simulation,
     generate_all_uuids,
     load_uuid_and_cookie,
+    load_uuid_and_cookie_from_dict,
     login_flow,
     pre_login_flow,
     reinstall_app_simulation,
     save_uuid_and_cookie,
+    get_uuid_and_cookie,
     set_device,
     sync_launcher,
     get_prefill_candidates,
@@ -210,8 +212,14 @@ class API(object):
     def load_uuid_and_cookie(self, load_uuid=True, load_cookie=True):
         return load_uuid_and_cookie(self, load_uuid=load_uuid, load_cookie=load_cookie)
 
+    def load_uuid_and_cookie_from_dict(self, load_uuid=True, load_cookie=True):
+        return load_uuid_and_cookie_from_dict(self, cookie_dict=cookie_dict, load_uuid=load_uuid, load_cookie=load_cookie)
+
     def save_uuid_and_cookie(self):
         return save_uuid_and_cookie(self)
+
+    def get_uuid_and_cookie(self):
+        return get_uuid_and_cookie(self)
 
     def encrypt_password(self, password):
         IG_LOGIN_ANDROID_PUBLIC_KEY = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF1enRZOEZvUlRGRU9mK1RkTGlUdAplN3FIQXY1cmdBMmk5RkQ0YjgzZk1GK3hheW14b0xSdU5KTitRanJ3dnBuSm1LQ0QxNGd3K2w3TGQ0RHkvRHVFCkRiZlpKcmRRWkJIT3drS3RqdDdkNWlhZFdOSjdLczlBM0NNbzB5UktyZFBGU1dsS21lQVJsTlFrVXF0YkNmTzcKT2phY3ZYV2dJcGlqTkdJRVk4UkdzRWJWZmdxSmsrZzhuQWZiT0xjNmEwbTMxckJWZUJ6Z0hkYWExeFNKOGJHcQplbG4zbWh4WDU2cmpTOG5LZGk4MzRZSlNaV3VxUHZmWWUrbEV6Nk5laU1FMEo3dE80eWxmeWlPQ05ycnF3SnJnCjBXWTFEeDd4MHlZajdrN1NkUWVLVUVaZ3FjNUFuVitjNUQ2SjJTSTlGMnNoZWxGNWVvZjJOYkl2TmFNakpSRDgKb1FJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
@@ -256,6 +264,7 @@ class API(object):
         use_cookie=True,
         use_uuid=True,
         cookie_fname=None,
+        cookie_dict=None,
         ask_for_code=False,
         set_device=True,
         generate_all_uuids=True,
@@ -274,20 +283,34 @@ class API(object):
         self.set_proxy()  # Only happens if `self.proxy`
 
         self.cookie_fname = cookie_fname
-        if self.cookie_fname is None:
+
+        if not cookie_dict and self.cookie_fname is None:
             fmt = "{username}_uuid_and_cookie.json"
             cookie_fname = fmt.format(username=username)
             self.cookie_fname = os.path.join(self.base_path, cookie_fname)
 
         cookie_is_loaded = False
+        re_login = True
         msg = "Login flow failed, the cookie is broken. Relogin again."
 
         if use_cookie is True:
+
+            if cookie_dict:
+                if (
+                    self.load_uuid_and_cookie_from_dict(cookie_dict, load_cookie=use_cookie,
+                                                        load_uuid=use_uuid)
+                    is True
+                ):
+                    re_login = False
+            elif self.cookie_fname:
+                if (
+                    self.load_uuid_and_cookie(load_cookie=use_cookie,
+                                                  load_uuid=use_uuid)
+                    is True
+                ):
+                    re_login = False
             # try:
-            if (
-                self.load_uuid_and_cookie(load_cookie=use_cookie, load_uuid=use_uuid)
-                is True
-            ):
+            if not re_login:
                 # Check if the token loaded is valid.
                 if self.login_flow(False) is True:
                     cookie_is_loaded = True
