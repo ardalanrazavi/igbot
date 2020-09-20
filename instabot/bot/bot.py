@@ -555,8 +555,8 @@ class Bot(object):
         """
         return get_archived_medias(self, as_dict)
 
-    def get_timeline_medias(self):
-        return get_timeline_medias(self)
+    def get_timeline_medias(self, filtration=False):
+        return get_timeline_medias(self, filtration)
 
     def get_popular_medias(self):
         return get_popular_medias(self)
