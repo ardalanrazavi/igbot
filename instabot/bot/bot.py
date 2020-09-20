@@ -66,6 +66,7 @@ from .bot_get import (
     get_media_id_from_link,
     get_media_info,
     get_media_likers,
+    get_media_likers_info,
     get_media_owner,
     get_messages,
     get_pending_follow_requests,
@@ -628,6 +629,9 @@ class Bot(object):
 
     def get_media_likers(self, media_id):
         return get_media_likers(self, media_id)
+
+    def get_media_likers_info(self, media_id):
+        return get_media_likers_info(self, media_id)
 
     def get_media_comments(self, media_id, only_text=False):
         return get_media_comments(self, media_id, only_text)

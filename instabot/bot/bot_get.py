@@ -275,6 +275,14 @@ def get_media_likers(self, media_id):
     return list(map(lambda user: str(user["pk"]), self.api.last_json["users"]))
 
 
+def get_media_likers_info(self, media_id):
+    self.api.get_media_likers(media_id)
+    if "users" not in self.api.last_json:
+        self.logger.info("Media with %s not found." % media_id)
+        return []
+    return self.api.last_json["users"]
+
+
 def get_media_comments(self, media_id, only_text=False):
     self.api.get_media_comments(media_id)
     if "comments" not in self.api.last_json:
