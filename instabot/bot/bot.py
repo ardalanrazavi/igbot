@@ -73,6 +73,7 @@ from .bot_get import (
     get_popular_medias,
     get_self_story_viewers,
     get_timeline_medias,
+    get_timeline_medias_info,
     get_timeline_users,
     get_total_hashtag_medias,
     get_total_user_medias,
@@ -557,6 +558,10 @@ class Bot(object):
 
     def get_timeline_medias(self, filtration=False):
         return get_timeline_medias(self, filtration)
+
+
+    def get_timeline_medias_info(self):
+        return get_timeline_medias_info(self)
 
     def get_popular_medias(self):
         return get_popular_medias(self)

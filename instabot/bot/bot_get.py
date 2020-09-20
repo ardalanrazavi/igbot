@@ -4,7 +4,7 @@
 """
 
 from tqdm import tqdm
-
+from typing import Union, List, Dict
 # STORY
 
 
@@ -73,6 +73,7 @@ def get_archived_medias(self, as_dict=False):
 
 
 def get_timeline_medias(self, filtration=True):
+    response_dict = {}
     if not self.api.get_timeline_feed():
         self.logger.warning("Error while getting timeline feed.")
         return []
@@ -83,6 +84,20 @@ def get_timeline_medias(self, filtration=True):
         if item.get("media_or_ad")
     ]
     return self.filter_medias(feed_items, filtration)
+
+
+def get_timeline_medias_info(self):
+
+    if not self.api.get_timeline_feed():
+        self.logger.warning("Error while getting timeline feed.")
+        return []
+
+    feed_items = [
+        item["media_or_ad"]
+        for item in self.api.last_json["feed_items"]
+        if item.get("media_or_ad")
+    ]
+    return feed_items
 
 
 def get_user_medias(self, user_id, filtration=True, is_comment=False):
