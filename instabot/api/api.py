@@ -213,7 +213,7 @@ class API(object):
         return load_uuid_and_cookie(self, load_uuid=load_uuid, load_cookie=load_cookie)
 
     def load_uuid_and_cookie_from_dict(self, load_uuid=True, load_cookie=True):
-        return load_uuid_and_cookie_from_dict(self, cookie_dict=cookie_dict, load_uuid=load_uuid, load_cookie=load_cookie)
+        return load_uuid_and_cookie_from_dict(self, load_uuid=load_uuid, load_cookie=load_cookie)
 
     def save_uuid_and_cookie(self):
         return save_uuid_and_cookie(self)
@@ -264,7 +264,7 @@ class API(object):
         use_cookie=True,
         use_uuid=True,
         cookie_fname=None,
-        cookie_dict=None,
+        cookie_dict_settings=None,
         ask_for_code=False,
         set_device=True,
         generate_all_uuids=True,
@@ -283,8 +283,9 @@ class API(object):
         self.set_proxy()  # Only happens if `self.proxy`
 
         self.cookie_fname = cookie_fname
+        self.cookie_dict_settings = cookie_dict_settings
 
-        if not cookie_dict and self.cookie_fname is None:
+        if not self.cookie_dict_settings and self.cookie_fname is None:
             fmt = "{username}_uuid_and_cookie.json"
             cookie_fname = fmt.format(username=username)
             self.cookie_fname = os.path.join(self.base_path, cookie_fname)
@@ -295,9 +296,9 @@ class API(object):
 
         if use_cookie is True:
 
-            if cookie_dict:
+            if self.cookie_dict_settings:
                 if (
-                    self.load_uuid_and_cookie_from_dict(cookie_dict, load_cookie=use_cookie,
+                    self.load_uuid_and_cookie_from_dict(load_cookie=use_cookie,
                                                         load_uuid=use_uuid)
                     is True
                 ):

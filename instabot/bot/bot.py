@@ -278,6 +278,7 @@ class Bot(object):
         self.logger = self.api.logger
         self.logger.info("Instabot version: " + version + " Started")
         self.logger.debug("Bot imported from {}".format(__file__))
+        print("Load my version")
 
     @property
     def user_id(self):

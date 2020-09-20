@@ -393,13 +393,13 @@ def load_uuid_and_cookie(self, load_uuid=True, load_cookie=True):
     return True
 
 
-def load_uuid_and_cookie_from_dict(self, cookie_dict={}, load_uuid=True, load_cookie=True):
-        if cookie_dict is None:
+def load_uuid_and_cookie_from_dict(self, load_uuid=True, load_cookie=True):
+        if self.cookie_dict_settings is None:
             self.logger.error("No cookie dictionary passed in.")
             return False
 
         self.logger.info("Got to dict loading cookie")
-        data = cookie_dict
+        data = self.cookie_dict_settings
         if "cookie" in data:
             self.last_login = data["timing_value"]["last_login"]
             self.last_experiments = data["timing_value"][
@@ -456,6 +456,7 @@ def load_uuid_and_cookie_from_dict(self, cookie_dict={}, load_uuid=True, load_co
             self.set_device()
             self.generate_all_uuids()
 
+        print("Loaded cookies from dictionary (NOT A FILE)")
         self.is_logged_in = True
         return True
 
