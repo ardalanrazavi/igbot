@@ -73,7 +73,6 @@ def get_archived_medias(self, as_dict=False):
 
 
 def get_timeline_medias(self, filtration=True):
-    response_dict = {}
     if not self.api.get_timeline_feed():
         self.logger.warning("Error while getting timeline feed.")
         return []

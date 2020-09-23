@@ -560,7 +560,6 @@ class Bot(object):
     def get_timeline_medias(self, filtration=False):
         return get_timeline_medias(self, filtration)
 
-
     def get_timeline_medias_info(self):
         return get_timeline_medias_info(self)
 
